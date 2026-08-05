@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const ActivityTypeSchema = z.enum([
-  "running", "walking", "hiking", "cycling", "swimming", "strength", "mobility", "obstacle", "recovery", "custom",
+  "running", "walking", "hiking", "cycling", "swimming", "strength", "mobility", "obstacle", "recovery", "sport", "custom",
 ]);
 export const UnitSystemSchema = z.enum(["metric", "imperial"]);
 export const GoalFocusSchema = z.enum(["strength", "cardio", "hybrid", "mobility", "general_health"]);
@@ -34,6 +34,65 @@ export const CampaignEnrollmentInput = z.object({
     difficulty: z.enum(["gentle", "standard", "challenging"]).default("standard"),
   }),
 });
+
+// ---------- Choose Your Journey ----------
+export const PlanTemplateKeySchema = z.enum(["initiation-3", "agoge-9", "forge-30", "discipline-60", "transformation-90", "legacy-300"]);
+export const ExperienceSchema = z.enum(["new", "returning", "regular", "experienced"]);
+const weekday = z.number().int().min(0).max(6);
+
+/** Mirrors `PlanInputs` in @agogeraining/campaigns and `internal.validate_plan_inputs` in SQL. */
+export const PlanInputsSchema = z.object({
+  experience: ExperienceSchema,
+  focus: GoalFocusSchema,
+  availableWeekdays: z.array(weekday).min(1, "Choose at least one training day").max(6, "Keep at least one rest day")
+    .refine((a) => new Set(a).size === a.length, "Duplicate weekday"),
+  sportDays: z.array(weekday).max(4).refine((a) => new Set(a).size === a.length, "Duplicate weekday"),
+  sportName: z.string().trim().max(40).nullable(),
+  maxSessionMinutes: z.number().int().min(10).max(180),
+  equipment: z.enum(["none", "home_basic", "full_gym"]),
+  hasLimitations: z.boolean(),
+  recoveryStyle: z.enum(["active", "full_rest"]),
+  eventDate: localDate.nullable(),
+});
+export type PlanInputsDto = z.infer<typeof PlanInputsSchema>;
+
+export const GoalInputSchema = z.object({
+  title: z.string().trim().min(3).max(80),
+  metric: z.string().min(1).max(40),
+  direction: z.enum(["higher_better", "lower_better"]),
+  baseline: z.number().nonnegative().nullable(),
+  target: z.number().positive(),
+  unit: z.enum(["kg", "lb", "m", "km", "mi", "s", "min", "h", "reps"]),
+  targetDate: localDate,
+});
+export type GoalInput = z.infer<typeof GoalInputSchema>;
+
+export const CreateJourneyInput = z.object({
+  templateKey: PlanTemplateKeySchema,
+  planInputs: PlanInputsSchema,
+  baseline: z.object({
+    pushUps: z.number().int().min(0).max(500).optional(),
+    walkMinutes: z.number().min(0).max(600).optional(),
+    currentTrainingDays: z.number().int().min(0).max(7).optional(),
+    ageBand: z.string().optional(),
+    limitationsNote: z.string().max(500).optional(),
+  }),
+  goal: GoalInputSchema,
+  timezone: z.string().min(1),
+});
+export type CreateJourneyInput = z.infer<typeof CreateJourneyInput>;
+
+export const AssessmentInputSchema = z.object({
+  checkpointDay: z.number().int().refine((d) => [3, 9, 30, 60, 90, 300].includes(d), "Not a checkpoint day"),
+  responses: z.object({
+    energy: z.number().int().min(1).max(5),
+    soreness: z.number().int().min(1).max(5),
+    scheduleFit: z.enum(["good", "too_much", "too_little"]),
+    confidence: z.number().int().min(1).max(5),
+    notes: z.string().max(1000).optional(),
+  }),
+});
+export type AssessmentInput = z.infer<typeof AssessmentInputSchema>;
 
 export const CompleteWorkoutInput = z.object({
   idempotencyKey: z.string().uuid(),

@@ -1,4 +1,6 @@
-import type { AttemptResult, ChallengeRow, CommandCenter, MeasurementRow, MutationResult, ReflectionRow, WorkoutRow } from "@agogeraining/shared-types";
+import type {
+  AssessmentRow, AttemptResult, ChallengeRow, CommandCenter, GoalRow, MeasurementRow, MutationResult, PlanChangeRow, PlannedSessionView, ReflectionRow, WorkoutRow,
+} from "@agogeraining/shared-types";
 import { MutationResult as MutationResultSchema } from "@agogeraining/shared-types";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { supabase } from "../supabase";
@@ -43,9 +45,6 @@ export const remoteApi: GameApi = {
   },
   async recordConsent(type, granted) {
     await rpc("record_consent", { p_type: type, p_version: "2026-11", p_granted: granted });
-  },
-  async enroll(i) {
-    await rpc("create_campaign_enrollment", { p_template_key: i.templateKey, p_baseline: i.baseline, p_preferences: i.preferences });
   },
   async getCommandCenter(localDate) {
     return rpc<CommandCenter>("get_command_center", { p_local_date: localDate });
@@ -116,14 +115,63 @@ export const remoteApi: GameApi = {
     return MutationResultSchema.parse(raw) as MutationResult;
   },
   async getSettings() {
-    const { data, error } = await client().from("user_settings").select("timezone,unit_system").maybeSingle();
+    const { data, error } = await client().from("user_settings").select("timezone,unit_system,analytics_opt_in").maybeSingle();
     if (error) fail(error);
-    return { timezone: data?.timezone ?? "UTC", unitSystem: (data?.unit_system ?? "metric") as "metric" | "imperial" };
+    return { timezone: data?.timezone ?? "UTC", unitSystem: (data?.unit_system ?? "metric") as "metric" | "imperial", analyticsOptIn: data?.analytics_opt_in === true };
   },
   async exportMyData() {
     return rpc("export_my_data");
   },
   async signOut() {
     await client().auth.signOut();
+  },
+
+  // ---- Choose Your Journey ----
+  async createJourney(i) {
+    const raw = await rpc<unknown>("create_journey", {
+      p_template_key: i.templateKey, p_plan_inputs: i.planInputs, p_baseline: i.baseline, p_goal: i.goal, p_timezone: i.timezone,
+    });
+    return MutationResultSchema.parse(raw) as MutationResult;
+  },
+  async extendJourney(templateKey) {
+    const raw = await rpc<unknown>("extend_journey", { p_template_key: templateKey, p_confirmed: true });
+    return MutationResultSchema.parse(raw) as MutationResult;
+  },
+  async setJourneyPaused(paused) {
+    await rpc("set_campaign_paused", { p_paused: paused });
+  },
+  async updateJourneyPlan(inputs, reason) {
+    await rpc("update_journey_plan", { p_plan_inputs: inputs, p_reason: reason });
+  },
+  async getJourneyPlan(journeyId) {
+    const [sessions, credited] = await Promise.all([
+      rows<{ spec: PlannedSessionView }>(client().from("planned_sessions").select("spec").eq("campaign_id", journeyId).is("superseded_at", null).order("program_day", { ascending: true }).limit(400)),
+      rows<{ program_day: number; calendar_date_local: string }>(client().from("campaign_day_records").select("program_day,calendar_date_local").eq("campaign_id", journeyId).order("program_day", { ascending: true }).limit(400)),
+    ]);
+    return { sessions: sessions.map((r) => r.spec), credited: credited.map((r) => ({ programDay: Number(r.program_day), localDate: String(r.calendar_date_local) })) };
+  },
+  async listPlanChanges(journeyId) {
+    const r = await rows<Record<string, unknown>>(client().from("journey_plan_changes").select("kind,from_template_key,to_template_key,effective_program_day,effective_date,reason,created_at").eq("campaign_id", journeyId).order("id", { ascending: false }).limit(50));
+    return r.map((x): PlanChangeRow => ({
+      kind: String(x.kind), fromTemplateKey: (x.from_template_key as string | null) ?? null, toTemplateKey: String(x.to_template_key),
+      effectiveProgramDay: Number(x.effective_program_day), effectiveDate: String(x.effective_date), reason: (x.reason as string | null) ?? null, createdAt: String(x.created_at),
+    }));
+  },
+  async listGoals() {
+    const r = await rows<Record<string, unknown>>(client().from("player_goals").select("id,title,metric,direction,baseline,target,unit,target_date,status").order("created_at", { ascending: false }).limit(20));
+    return r.map((g): GoalRow => ({
+      id: String(g.id), title: String(g.title), metric: String(g.metric), direction: g.direction as GoalRow["direction"],
+      baseline: g.baseline === null ? null : Number(g.baseline), target: Number(g.target), unit: String(g.unit), targetDate: String(g.target_date), status: g.status as GoalRow["status"],
+    }));
+  },
+  async addGoal(goal) {
+    await rpc("add_player_goal", { p_goal: goal });
+  },
+  async recordAssessment(i) {
+    await rpc("record_checkpoint_assessment", { p_checkpoint_day: i.checkpointDay, p_responses: i.responses });
+  },
+  async listAssessments(journeyId) {
+    const r = await rows<Record<string, unknown>>(client().from("journey_assessments").select("checkpoint_day,responses,created_at").eq("campaign_id", journeyId).order("checkpoint_day", { ascending: true }));
+    return r.map((a): AssessmentRow => ({ checkpointDay: Number(a.checkpoint_day), responses: a.responses as Record<string, unknown>, createdAt: String(a.created_at) }));
   },
 };

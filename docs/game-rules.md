@@ -1,10 +1,12 @@
 # Game rules (rules version 1)
 
 ## Progression
-- **Qualifying program days**, not calendar days. A primary quest completed on a local date qualifies *one* program day.
-  Missed days delay completion but never erase progress. Pause/resume supported. Planned recovery counts.
-- Gates: Day 9 / 30 / 60 / 90 / 300. Only **Day 9 (Hoplitēs)** is playable now; the others exist as versioned `rank_requirements`
-  rows and are labelled *planned* in the UI.
+- Players choose a **journey horizon** (3/9/30/60/90/300) — see [journeys.md](journeys.md). Every journey starts at Day 1
+  and can be extended without resetting.
+- **Eligible program days**, not calendar days. Completing the planned session on a local date credits *one* program day
+  (planned recovery counts with a check-in). Missed days delay completion but never erase progress. Pause/resume supported.
+- Gates: Day 9 / 30 / 60 / 90 / 300, counted over lifetime eligible days. Day 3 is a readiness review, never a promotion.
+  Day 90/300 need device-recorded / coach-reviewed trial evidence, which the app can't produce yet.
 - **Player XP level** 1–100: `xpToReachLevel(L) = round(40 · (L−1)^1.8)`. Early levels fast, later slower. Never decreases.
 - **Rank** is separate and gated: days + XP minimum + a passed, linked, accepted trial with sufficient evidence. Coins/cosmetics
   cannot bypass it. Earned ranks are retained. Ranks must be earned in order.
@@ -35,9 +37,10 @@ Ordinary daily cap **120**. The last item is partially awarded to hit the cap ex
 Coins (cosmetic only): 10 / 3 / 2 / 5 / 20 / 30 / 100 for the same sources. No cash value, no loot boxes, no pay-to-win.
 
 ## Quest qualification
-A workout qualifies the current program day if its activity type is in the day's allowed list (equivalents allowed) and it
-meets the minimum duration. Recovery/rest days have a 0-second minimum. An activity that doesn't match the day is still saved
-but doesn't qualify that day. Side quests only count after the day has qualified (not from the same session).
+A workout qualifies the next program day if its activity type is in the planned session's allowed list (equivalents allowed)
+and it meets the minimum duration (half the planned minutes, at least 5). Recovery days have a 0-second minimum. A fixed
+sport day accepts `sport`. An activity that doesn't match is still saved but doesn't qualify the day. A date earlier than the
+last credited date can't be credited. Side quests only count after the day has qualified (not from the same session).
 
 ## Trials and challenges
 State machine: `draft → active → attempted → submitted → verified → passed | failed`; `failed → active` (retry). Every

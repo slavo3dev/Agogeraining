@@ -11,9 +11,18 @@ Source: `supabase/migrations/`. Timestamps are UTC; `local_day` + `timezone` sto
 | `…000500_game_functions` | All server-authoritative RPCs (see below) |
 | `…000600_rls_and_grants` | RLS, least-privilege grants, RPC execute grants |
 | `…000700_storage` | Private `private-evidence` bucket, owner-only policies (skipped where `storage` is absent) |
+| `20261109000800_journeys_schema` | `sport` activity type; `campaign_templates` + tier/version/description; `user_campaigns` + timezone, start_date, plan_inputs, goal_snapshot, generation_version; `campaign_day_records` + eligibility_reason, planned_session_id; new `session_archetypes`, `planned_sessions` (immutable, versioned), `journey_plan_changes`, `player_goals`, `journey_assessments` |
+| `20261109000900_journey_reference_data` | **Generated.** Six plan templates, session library, journey achievements, feature flag |
+| `20261109001000_journey_functions` | Generator (`internal.generate_sessions`), journey RPCs, rewritten `complete_workout` / `get_command_center` / `export_my_data`, legacy backfill, RLS + grants |
+
+Naming: the spec's *player_journeys* is `user_campaigns`, *plan_templates* is `campaign_templates`, *journey_days* (credited)
+is `campaign_day_records`, *training_plans/weeks/sessions* is `planned_sessions` (week + phase columns), *promotion_trials*
+are `user_challenges` linked to a rank with `challenge_attempts`.
 
 ## RPC surface (`authenticated` only)
-`create_player_profile`, `record_consent`, `create_campaign_enrollment`, `set_campaign_paused`, `complete_workout`,
+`create_player_profile`, `record_consent`, `create_campaign_enrollment` (legacy), `create_journey`, `preview_journey`,
+`extend_journey`, `update_journey_plan`, `add_player_goal`, `set_goal_status`, `record_checkpoint_assessment`,
+`set_campaign_paused`, `complete_workout`,
 `record_stoic_reflection`, `record_measurement`, `create_personal_challenge`, `submit_challenge_attempt`, `retry_challenge`,
 `verify_challenge_attempt` (admin JWT claim), `evaluate_promotion_eligibility`, `claim_promotion`, `get_command_center`, `export_my_data`.
 Everything in schema `internal` (e.g. `award_xp`) is unreachable from clients.

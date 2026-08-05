@@ -13,14 +13,18 @@ const PRESETS = [
   { key: "mile", title: "Timed mile (walk or run)", metric: "mile_time", direction: "lower_better", unit: "min" },
   { key: "plank", title: "Plank hold", metric: "plank_seconds", direction: "higher_better", unit: "s" },
   { key: "walk", title: "Longest comfortable walk", metric: "walk_distance", direction: "higher_better", unit: "km" },
+  { key: "walk_mi", title: "Longest comfortable walk (mi)", metric: "walk_distance", direction: "higher_better", unit: "mi" },
+  { key: "squat", title: "Goblet squat", metric: "goblet_squat", direction: "higher_better", unit: "kg" },
+  { key: "squat_lb", title: "Goblet squat (lb)", metric: "goblet_squat", direction: "higher_better", unit: "lb" },
 ] as const;
 
 export default function NewChallenge() {
-  const { rank } = useLocalSearchParams<{ rank?: string }>();
+  const { rank, metric, baseline: gBaseline, target: gTarget, unit: gUnit } = useLocalSearchParams<{ rank?: string; metric?: string; baseline?: string; target?: string; unit?: string }>();
   const api = useApi(); const router = useRouter();
-  const [preset, setPreset] = useState<(typeof PRESETS)[number]>(PRESETS[0]);
-  const [baseline, setBaseline] = useState(""); const [target, setTarget] = useState(""); const [days, setDays] = useState(2);
-  const [linked, setLinked] = useState(!!rank); const [improve, setImprove] = useState(!!rank);
+  const fromGoal = PRESETS.find((p) => p.metric === metric && p.unit === gUnit);
+  const [preset, setPreset] = useState<(typeof PRESETS)[number]>(fromGoal ?? PRESETS[0]);
+  const [baseline, setBaseline] = useState(fromGoal ? gBaseline ?? "" : ""); const [target, setTarget] = useState(fromGoal ? gTarget ?? "" : ""); const [days, setDays] = useState(2);
+  const [linked, setLinked] = useState(!!rank); const [improve, setImprove] = useState(!!rank && !fromGoal);
   const [busy, setBusy] = useState(false); const [err, setErr] = useState<string | null>(null);
 
   const save = async () => {

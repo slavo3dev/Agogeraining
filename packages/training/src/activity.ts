@@ -1,6 +1,6 @@
 export const ACTIVITY_TYPES = [
   "running", "walking", "hiking", "cycling", "swimming", "strength",
-  "mobility", "obstacle", "recovery", "custom",
+  "mobility", "obstacle", "recovery", "sport", "custom",
 ] as const;
 export type ActivityType = (typeof ACTIVITY_TYPES)[number];
 

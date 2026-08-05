@@ -9,13 +9,15 @@ export const backendConfigured = env.supabaseUrl.length > 0 && env.supabaseAnonK
 /** Honest feature status shown in the UI and docs. */
 export const FEATURE_STATUS = {
   manualWorkouts: "implemented",
-  nineDayCampaign: "implemented",
+  chooseYourJourney: "implemented",
+  journeyExtension: "implemented",
   personalChallenges: "implemented",
   bodyProgress: "implemented",
   stoicReflection: "implemented",
   phalanx: "planned",
   healthKit: "planned",
   healthConnect: "planned",
-  campaign30to300: "planned",
+  deviceEvidenceForDay90Plus: "planned",
+  aiPlanSuggestions: "planned",
   notifications: "planned",
 } as const;

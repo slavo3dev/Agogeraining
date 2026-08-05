@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { RewardModal } from "../src/components/game";
 import { AppText } from "../src/components/ui";
+import { analytics } from "../src/lib/analytics";
 import { getApi } from "../src/services/api";
 import { draftQueue } from "../src/services/drafts";
 import { queryClient } from "../src/services/queryClient";
@@ -37,6 +38,12 @@ function Gate() {
     if (first === "(auth)" || first === "onboarding" || first === undefined) router.replace("/(tabs)");
   }, [ready, mode, hasProfile, segments, router]);
 
+  // Restore the analytics consent (off unless the player opted in).
+  useEffect(() => {
+    if (mode === "none" || !hasProfile) { analytics.setOptIn(false); return; }
+    getApi().getSettings().then((st) => analytics.setOptIn(st.analyticsOptIn)).catch(() => analytics.setOptIn(false));
+  }, [mode, hasProfile]);
+
   // Retry offline workout drafts on launch and whenever the app returns to the foreground.
   useEffect(() => {
     if (mode === "none" || !hasProfile) return;
@@ -61,6 +68,11 @@ function Gate() {
         <Stack.Screen name="reflection" options={{ title: "Stoic reflection", presentation: "modal" }} />
         <Stack.Screen name="challenge/new" options={{ title: "New challenge", presentation: "modal" }} />
         <Stack.Screen name="challenge/[id]" options={{ title: "Challenge" }} />
+        <Stack.Screen name="journey/index" options={{ title: "My Journey" }} />
+        <Stack.Screen name="journey/new" options={{ title: "Choose your journey" }} />
+        <Stack.Screen name="journey/extend" options={{ title: "Extend journey" }} />
+        <Stack.Screen name="journey/adjust" options={{ title: "Adjust plan" }} />
+        <Stack.Screen name="journey/checkpoint" options={{ title: "Checkpoint", presentation: "modal" }} />
       </Stack>
       <RewardModal />
     </>

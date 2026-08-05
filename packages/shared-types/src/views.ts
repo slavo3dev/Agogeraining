@@ -1,4 +1,4 @@
-import type { AuthoritativePlayerState, NewReward } from "./index";
+import type { AuthoritativePlayerState, NewReward, PlanInputsDto } from "./index";
 
 export interface QuestSpecView {
   type: string;
@@ -30,9 +30,28 @@ export interface PromotionEvaluation {
   rankKey?: string;
   rankName?: string;
 }
+export interface CheckpointView { day: number; kind: "readiness" | "promotion"; rankKey: string | null }
+export interface PlannedSessionView {
+  programDay: number;
+  scheduledFor: string;
+  phase: "preparation" | "base" | "build" | "peak" | "event" | "transition";
+  week: number;
+  deload: boolean;
+  sessionType: string;
+  intensity: "rest" | "easy" | "moderate" | "hard";
+  plannedMinutes: number;
+  title: string;
+  description: string;
+  primary: QuestSpecView;
+  side: Array<QuestSpecView & { label: string }>;
+  alternatives: { noGym: string; indoorOnly: string; limitedTime: string; mobility: string };
+  exercises: Array<{ slug: string; sets: number; reps: string }>;
+  checkpoint: CheckpointView | null;
+}
 export interface CommandCenter {
   player: AuthoritativePlayerState;
   profile: { displayName: string; avatarId: string; rankName: string };
+  /** The player's current journey (`user_campaigns`). */
   campaign: null | {
     id: string;
     state: "active" | "paused" | "completed";
@@ -42,6 +61,18 @@ export interface CommandCenter {
     qualifiedToday: boolean;
     day: DayView;
     sideQuests: SideQuestView[];
+    templateKey: string;
+    planName: string;
+    tier: "prep" | "campaign";
+    startDate: string | null;
+    generation: number;
+    planInputs: PlanInputsDto | null;
+    /** Session for `programDay` (today's credited day, or the next one). */
+    session: PlannedSessionView | null;
+    /** Next uncredited sessions, in order (max 7). */
+    upcoming: PlannedSessionView[];
+    /** Checkpoint days reached that still have no readiness/checkpoint review. */
+    pendingReviews: number[];
   };
   nextRank: PromotionEvaluation | null;
   recentXp: Array<{ source: string; xp: number; at: string }>;
@@ -85,3 +116,25 @@ export interface AttemptResult {
   duplicate: boolean;
   outcome?: "passed" | "failed" | "needs_review" | string;
 }
+
+export interface GoalRow {
+  id: string;
+  title: string;
+  metric: string;
+  direction: "higher_better" | "lower_better";
+  baseline: number | null;
+  target: number;
+  unit: string;
+  targetDate: string;
+  status: "active" | "achieved" | "retired";
+}
+export interface PlanChangeRow {
+  kind: string;
+  fromTemplateKey: string | null;
+  toTemplateKey: string;
+  effectiveProgramDay: number;
+  effectiveDate: string;
+  reason: string | null;
+  createdAt: string;
+}
+export interface AssessmentRow { checkpointDay: number; responses: Record<string, unknown>; createdAt: string }

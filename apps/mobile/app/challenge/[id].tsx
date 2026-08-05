@@ -3,6 +3,7 @@ import { useLocalSearchParams } from "expo-router";
 import React, { useRef, useState } from "react";
 import { ChallengeCard, SpartanCard } from "../../src/components/game";
 import { AppText, Button, ErrorState, FormField, Loading, Screen } from "../../src/components/ui";
+import { track } from "../../src/lib/analytics";
 import { v4 } from "../../src/lib/uuid";
 import { useApi } from "../../src/services/api";
 import { invalidateGame } from "../../src/services/queryClient";
@@ -19,7 +20,7 @@ export default function ChallengeDetail() {
 
   const submit = useMutation({
     mutationFn: () => api.submitAttempt(id, Number(value), c!.unit, attemptKey.current),
-    onSuccess: async (r) => { setOutcome(r.outcome ?? null); useRewards.getState().show(r.newRewards); await invalidateGame(); },
+    onSuccess: async (r) => { if (!r.duplicate) track("trial_attempted", { outcome: r.outcome ?? null, promotion: !!c?.linkedRankKey }); setOutcome(r.outcome ?? null); useRewards.getState().show(r.newRewards); await invalidateGame(); },
   });
   const retry = useMutation({ mutationFn: () => api.retryChallenge(id), onSuccess: async () => { attemptKey.current = v4(); setOutcome(null); setValue(""); await invalidateGame(); } });
 

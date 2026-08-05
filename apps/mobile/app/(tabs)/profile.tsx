@@ -11,6 +11,7 @@ import { FEATURE_STATUS } from "../../src/config/env";
 import { todayLocal } from "../../src/lib/dates";
 import { useApi, demoApi } from "../../src/services/api";
 import { invalidateGame } from "../../src/services/queryClient";
+import { analytics } from "../../src/lib/analytics";
 import { useSession } from "../../src/stores/session";
 import { usePrefs } from "../../src/theme";
 
@@ -23,6 +24,12 @@ export default function Profile() {
   const refl = useQuery({ queryKey: ["reflections", mode], queryFn: () => api.listReflections() });
   const st = useQuery({ queryKey: ["settings", mode], queryFn: () => api.getSettings() });
   const units = st.data?.unitSystem ?? "metric";
+  const [analyticsOn, setAnalyticsOn] = useState<boolean | null>(null);
+  const analyticsValue = analyticsOn ?? st.data?.analyticsOptIn ?? false;
+  const setAnalytics = async (v: boolean) => {
+    setAnalyticsOn(v); analytics.setOptIn(v);
+    try { await api.recordConsent("analytics", v); } catch { /* demo/offline: preference applies locally */ }
+  };
 
   const weights = (ms.data ?? []).filter((m) => m.metricType === "weight");
   const display = (kg: number) => (units === "metric" ? kg : convert(kg, "kg", "lb"));
@@ -44,6 +51,12 @@ export default function Profile() {
       </View>
       {player ? <XPBar totalXp={player.lifetimeXp} /> : null}
       {player ? <View style={{ flexDirection: "row", gap: 8 }}><StatTile label="Level" value={String(player.level)} /><StatTile label="XP" value={String(player.lifetimeXp)} /><StatTile label="Coins" value={String(player.coins)} /></View> : null}
+
+      <SpartanCard>
+        <AppText variant="title">My Journey</AppText>
+        <AppText muted>{cc.data?.campaign ? `${cc.data.campaign.planName} · Day ${cc.data.campaign.qualifiedDays}/${cc.data.campaign.totalDays}` : "No journey yet."}</AppText>
+        <Button title={cc.data?.campaign ? "Change, extend or pause" : "Choose your journey"} variant="secondary" onPress={() => router.push(cc.data?.campaign ? "/journey" : "/journey/new")} />
+      </SpartanCard>
 
       <SpartanCard>
         <AppText variant="title">Rank history</AppText>
@@ -70,6 +83,7 @@ export default function Profile() {
         <View style={{ flexDirection: "row", gap: 8 }}>{(["dark", "light", "system"] as const).map((s) => <Chip key={s} label={s} selected={prefs.scheme === s} onPress={() => prefs.set({ scheme: s })} />)}</View>
         <Row label="Haptics"><Switch accessibilityLabel="Haptics" value={prefs.haptics} onValueChange={(v) => prefs.set({ haptics: v })} /></Row>
         <Row label="Reduce motion (in addition to system setting)"><Switch accessibilityLabel="Reduce motion" value={prefs.reducedMotionOverride} onValueChange={(v) => prefs.set({ reducedMotionOverride: v })} /></Row>
+        <Row label="Anonymous usage analytics"><Switch accessibilityLabel="Anonymous usage analytics" value={analyticsValue} onValueChange={(v) => void setAnalytics(v)} /></Row>
         <AppText variant="caption" muted>Units: {units === "metric" ? "metric (kg, km)" : "imperial (lb, mi)"} — set during onboarding.</AppText>
       </SpartanCard>
 

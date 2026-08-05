@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ACTIVITY_TYPES, parseDuration, convert } from "@agogeraining/training";
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
@@ -22,10 +22,12 @@ type Form = z.infer<typeof Schema>;
 
 export default function LogWorkout() {
   const api = useApi(); const router = useRouter(); const mode = useSession((s) => s.mode);
+  const { activity } = useLocalSearchParams<{ activity?: string }>();
+  const initial = (ACTIVITY_TYPES as readonly string[]).includes(activity ?? "") ? (activity as Form["activityType"]) : "strength";
   const st = useQuery({ queryKey: ["settings", mode], queryFn: () => api.getSettings() });
   const units = st.data?.unitSystem ?? "metric";
   const [busy, setBusy] = useState(false); const [err, setErr] = useState<string | null>(null);
-  const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<Form>({ resolver: zodResolver(Schema), defaultValues: { activityType: "strength", duration: "", distance: "", rpe: "", notes: "" } });
+  const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<Form>({ resolver: zodResolver(Schema), defaultValues: { activityType: initial, duration: "", distance: "", rpe: "", notes: "" } });
   const type = watch("activityType");
   const showDistance = ["running", "walking", "hiking", "cycling", "swimming"].includes(type);
 

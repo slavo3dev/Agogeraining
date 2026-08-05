@@ -1,3 +1,4 @@
+import { checkpointsFor } from "@agogeraining/campaigns";
 import { RANK_META, levelProgress } from "@agogeraining/game-engine";
 import type { ChallengeRow, PromotionEvaluation } from "@agogeraining/shared-types";
 import React, { useEffect } from "react";
@@ -77,27 +78,36 @@ export function QuestCard({ kind, title, body, done, children }: { kind: "primar
   );
 }
 
-/** 9-day path with locked future gates. Gates beyond Day 9 are labelled planned. */
+/** Journey map: day dots for short plans, a progress rail for long ones, and every checkpoint in the horizon. */
 export function CampaignPath({ qualifiedDays, total = 9 }: { qualifiedDays: number; total?: number }) {
   const { c } = useTheme();
-  const gates = [{ day: 9, rank: "Hoplitēs", live: true }, { day: 30, rank: "Enōmotarchēs", live: false }, { day: 60, rank: "Pentēkontēr", live: false }, { day: 90, rank: "Lochagos", live: false }, { day: 300, rank: "Polemarchos", live: false }];
+  const gates = checkpointsFor(total);
   return (
     <View style={{ gap: 12 }}>
-      <View accessible accessibilityLabel={`${qualifiedDays} of ${total} qualifying days complete`} style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-        {Array.from({ length: total }).map((_, i) => {
-          const done = i < qualifiedDays; const current = i === qualifiedDays;
-          return (
-            <View key={i} style={{ width: 34, height: 34, borderRadius: 17, alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: done ? c.recovery : current ? c.progress : c.surfaceElevated, backgroundColor: done ? c.recovery : "transparent" }}>
-              <AppText variant="caption" style={{ color: done ? "#F1E9DA" : c.text, fontWeight: "700" }}>{done ? "✓" : i + 1}</AppText>
-            </View>
-          );
-        })}
-      </View>
+      {total <= 30 ? (
+        <View accessible accessibilityLabel={`${qualifiedDays} of ${total} eligible days complete`} style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+          {Array.from({ length: total }).map((_, i) => {
+            const done = i < qualifiedDays; const current = i === qualifiedDays; const gate = gates.some((g) => g.day === i + 1);
+            return (
+              <View key={i} style={{ width: 30, height: 30, borderRadius: gate ? 6 : 15, alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: done ? c.recovery : current ? c.progress : gate ? c.primary : c.surfaceElevated, backgroundColor: done ? c.recovery : "transparent" }}>
+                <AppText variant="caption" style={{ color: done ? "#F1E9DA" : c.text, fontWeight: "700", fontSize: 11 }}>{done ? "✓" : i + 1}</AppText>
+              </View>
+            );
+          })}
+        </View>
+      ) : (
+        <View accessible accessibilityRole="progressbar" accessibilityLabel={`${qualifiedDays} of ${total} eligible days complete`} accessibilityValue={{ min: 0, max: total, now: qualifiedDays }} style={{ gap: 4 }}>
+          <View style={{ height: 10, borderRadius: 5, backgroundColor: c.surfaceElevated, overflow: "hidden" }}>
+            <View style={{ height: 10, width: `${Math.min(100, (qualifiedDays / total) * 100)}%`, backgroundColor: c.recovery }} />
+          </View>
+          <AppText variant="caption" muted>{qualifiedDays} / {total} eligible days</AppText>
+        </View>
+      )}
       <View style={{ gap: 4 }}>
         {gates.map((g) => (
           <View key={g.day} style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <AppText variant="caption" muted={!g.live}>Day {g.day} gate — {g.rank}</AppText>
-            <AppText variant="caption" muted>{g.live ? (qualifiedDays >= g.day ? "✓ reached" : "● in progress") : "planned"}</AppText>
+            <AppText variant="caption">Day {g.day} — {g.kind === "readiness" ? "Readiness review" : `${RANK_META.find((r) => r.rankKey === g.rankKey)?.name ?? ""} trial`}</AppText>
+            <AppText variant="caption" muted>{qualifiedDays >= g.day ? "✓ reached" : qualifiedDays + 1 === g.day ? "● next" : `in ${g.day - qualifiedDays} days`}</AppText>
           </View>
         ))}
       </View>
@@ -127,6 +137,9 @@ export function BossTrialCard({ evaluation, onPrepare, onClaim, claiming }: { ev
         <AppText key={i.key} accessibilityLabel={`${i.text}, ${missing.has(i.key) ? "not yet met" : "met"}`}>{missing.has(i.key) ? "○" : "✓"} {i.text}</AppText>
       ))}
       {evaluation.missing.filter((m) => !items.some((i) => i.key === m)).map((m) => <AppText key={m} variant="caption" muted>• {MISSING_LABEL[m] ?? m}</AppText>)}
+      {evaluation.rankKey === "lochagos" || evaluation.rankKey === "polemarchos" ? (
+        <AppText variant="caption" muted>This gate needs {evaluation.rankKey === "lochagos" ? "device-recorded or coach-reviewed" : "coach-reviewed"} evidence. Device import and coach review arrive in a later release; self-reported trials still earn challenge XP.</AppText>
+      ) : null}
       <AppText variant="caption" muted>Rank is earned through consistency and an approved trial — coins and cosmetics can never bypass it.</AppText>
       {evaluation.eligible ? <Button title="Claim promotion" onPress={onClaim} loading={claiming} /> : <Button title="Prepare a trial" variant="secondary" onPress={onPrepare} />}
     </SpartanCard>

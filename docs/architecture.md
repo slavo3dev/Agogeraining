@@ -42,6 +42,6 @@ Expo SDK 58, RN 0.88, Expo Router, TanStack Query (server state), Zustand (sessi
 
 ## Deliberate gaps
 
-Realtime Broadcast, Edge Functions, admin web, community tables, and `user_daily_quests` rows are **not built**. Quests are
-derived from `campaign_day_templates` + `campaign_day_records` instead of materialised per user — simpler and sufficient until
-per-user plan adaptation (Phase 2) needs stored assignments.
+Realtime Broadcast, Edge Functions, admin web and community tables are **not built**. Per-user quests are materialised as
+versioned `planned_sessions` (Choose Your Journey); the schedule generator exists in TypeScript and SQL with a parity test,
+the same pattern as the level curve. See [journeys.md](journeys.md).

@@ -10,18 +10,21 @@ A real-world fitness RPG for iOS and Android. *Spartan Levels* is a **working ti
 
 | Area | Status |
 |---|---|
-| 9-day Agōgē campaign (quests, recovery days, side quests, XP/coins, levels) | **implemented** |
+| Choose Your Journey: 3/9/30/60/90/300-day plans, preview, personalized schedule, extend without reset | **implemented** ([docs/journeys.md](docs/journeys.md)) |
+| Day 3 readiness review, Day 9/30/60 promotion trials, pause/resume/reschedule, schedule & sport-day changes | **implemented** |
+| 9-day Agōgē campaign (quests, recovery days, side quests, XP/coins, levels) | **implemented** (now one of six plans) |
 | Server-authoritative XP ledger, idempotency, rank promotion, trials | **implemented** (Postgres, tested) |
 | Manual workout logging with offline drafts | **implemented** |
 | Personal challenges + self-reported trials, admin review path | **implemented** |
 | Body measurements + trend chart, Stoic reflection | **implemented** |
 | Email/password auth, onboarding, 5-tab app, dark/light, reduced motion | **implemented** |
 | Local demo mode (dev builds only, labelled) | **implemented** |
-| Day 30/60/90/300 segments | planned (Phase 2 — rank gates + rules already versioned) |
+| Day 90/300 promotions | gated on device-recorded / coach-reviewed evidence (arrives with health import / admin web) |
+| AI plan suggestions | planned (opt-in, human-reviewable layer on top of the deterministic generator) |
 | Phalanx social | planned (Phase 3 — UI is an honest gate, not a fake feed) |
 | HealthKit / Health Connect | planned (Phase 4 — provider interfaces exist) |
 | Apple/Google sign-in, push notifications, admin web | planned |
-| Run on a simulator/emulator/device | **not yet verified** — see [docs/test-plan.md](docs/test-plan.md) |
+| Run on a simulator/emulator/device | **not yet verified** (web build of the demo flow is driven end-to-end) — see [docs/test-plan.md](docs/test-plan.md) |
 
 ## Prerequisites
 
@@ -36,7 +39,7 @@ A real-world fitness RPG for iOS and Android. *Spartan Levels* is a **working ti
 pnpm install
 pnpm test            # 8 packages, unit tests
 pnpm typecheck
-pnpm db:test         # applies every migration to a throwaway Postgres and runs 81 integration checks
+pnpm db:test         # applies every migration to a throwaway Postgres and runs 154 integration checks
 ```
 
 ### Run the app against a local backend
@@ -53,7 +56,7 @@ pnpm ios                                    # or: pnpm android
 
 Set `EXPO_PUBLIC_ENABLE_DEMO_MODE=true` in `apps/mobile/.env`, run `pnpm dev:mobile`, tap **Try local demo (dev only)**.
 It is simulated on-device, visibly labelled, ignored by production builds, and has a dev-only “Advance demo day” button
-so you can play all nine days. It cannot affect real accounts or leaderboards.
+so you can play through any journey. It cannot affect real accounts or leaderboards.
 
 > `expo-secure-store` and `react-native-reanimated` need a **development build** or recent Expo Go for SDK 58.
 > If Expo Go lacks something, run `npx expo run:ios` / `run:android` inside `apps/mobile`.
@@ -70,8 +73,9 @@ so you can play all nine days. It cannot affect real accounts or leaderboards.
 
 ## Reset / seed the database
 
-`pnpm db:reset` replays all migrations and `supabase/seed.sql`. Game rules, ranks, the 9-day campaign and the exercise
-catalog live in a **generated migration** (`20261102000400_reference_data.sql`); edit the TypeScript sources and run
+`pnpm db:reset` replays all migrations and `supabase/seed.sql`. Game rules, ranks, the 9-day campaign, the exercise
+catalog, the six plan templates and the session library live in **generated migrations**
+(`20261102000400_reference_data.sql`, `20261109000900_journey_reference_data.sql`); edit the TypeScript sources and run
 `pnpm gen:reference`. Never edit that SQL by hand — CI fails if it drifts.
 
 ## Private beta build (TestFlight / Android internal)
@@ -91,12 +95,12 @@ No credentials are in this repo. `.env.example` has placeholders only.
 ```
 apps/mobile            Expo Router app (iOS + Android)        apps/admin   planned
 packages/game-engine   XP, levels, quest rewards, rank + trial rules (pure TS, tested)
-packages/campaigns     Clock, timezone-safe day logic, 9-day template
+packages/campaigns     Clock, timezone-safe day logic, plan catalog, journey state machine, schedule generator
 packages/challenges    Trial state machine + goal plausibility
 packages/training      Units, activities, exercise catalog, import-provider boundary
 packages/community     Permission rules (Phase 3, not wired to UI)
 packages/shared-types  Zod API schemas + view models
 packages/design-tokens Brand token, colors, contrast helpers
 supabase/              migrations (schema, RLS, game functions), seed, tests
-docs/                  architecture · data-model · game-rules · design-system · roadmap · privacy-and-security · test-plan
+docs/                  architecture · journeys · data-model · game-rules · design-system · roadmap · privacy-and-security · test-plan
 ```
