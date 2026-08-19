@@ -1,0 +1,29 @@
+{
+  "name": "agogeraining",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Spartan Levels (working title) — real-world fitness RPG. Train in the real world. Level up in the game.",
+  "packageManager": "pnpm@12.8.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:mobile": "pnpm --filter @agogeraining/mobile start",
+    "ios": "pnpm --filter @agogeraining/mobile ios",
+    "android": "pnpm --filter @agogeraining/mobile android",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "lint": "pnpm -r --if-present lint",
+    "db:start": "supabase start",
+    "db:reset": "supabase db reset",
+    "db:test": "bash scripts/test-migrations.sh",
+    "db:types": "echo 'see docs/data-model.md'",
+    "gen:reference": "tsx scripts/gen-reference-sql.ts",
+    "check:reference": "tsx scripts/gen-reference-sql.ts --check"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "vitest": "^4.0.0"
+  }
+}

@@ -1,0 +1,35 @@
+# Local Supabase stack config (`supabase start`). Written against the documented CLI schema; NOT yet exercised
+# with the Supabase CLI in this repo's history — see docs/test-plan.md ("Verified vs unverified").
+project_id = "agogeraining"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+
+[db]
+port = 54322
+major_version = 17
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "agogeraining://"
+additional_redirect_urls = ["agogeraining://"]
+enable_signup = true
+minimum_password_length = 8
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false   # local dev only; keep true in hosted projects
+
+# Apple / Google sign-in: enable ONLY after you configure real credentials, then expose the button in the app.
+# [auth.external.apple]  enabled = false
+# [auth.external.google] enabled = false

@@ -1,0 +1,14 @@
+{
+  "name": "@agogeraining/campaigns",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": { "@agogeraining/training": "workspace:*" },
+  "devDependencies": { "typescript": "~6.0.3", "vitest": "^4.0.0" }
+}
