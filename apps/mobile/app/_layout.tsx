@@ -1,3 +1,4 @@
+import "../src/platform"; // must run first: wires storage/Supabase into @agogeraining/app-core
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -7,12 +8,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { RewardModal } from "../src/components/game";
 import { AppText } from "../src/components/ui";
-import { analytics } from "../src/lib/analytics";
-import { getApi } from "../src/services/api";
-import { draftQueue } from "../src/services/drafts";
-import { queryClient } from "../src/services/queryClient";
-import { bootstrapSession, useSession } from "../src/stores/session";
-import { useRewards } from "../src/stores/rewards";
+import { analytics, getApi, draftQueue, queryClient, bootstrapSession, useSession, useRewards } from "@agogeraining/app-core";
 import { ThemeProvider, useTheme } from "../src/theme";
 
 function Gate() {

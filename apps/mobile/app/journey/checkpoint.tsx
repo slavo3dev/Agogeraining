@@ -6,10 +6,7 @@ import React, { useState } from "react";
 import { View } from "react-native";
 import { SpartanCard } from "../../src/components/game";
 import { AppText, Button, Chip, ErrorState, FormField, Loading, Screen } from "../../src/components/ui";
-import { useCommandCenter } from "../../src/features/journey/hooks";
-import { journeyErrorMessage } from "../../src/features/journey/labels";
-import { useApi } from "../../src/services/api";
-import { invalidateGame } from "../../src/services/queryClient";
+import { useCommandCenter, journeyErrorMessage, useApi, invalidateGame } from "@agogeraining/app-core";
 
 function Scale({ label, value, onChange, low, high }: { label: string; value: number; onChange: (v: number) => void; low: string; high: string }) {
   return (

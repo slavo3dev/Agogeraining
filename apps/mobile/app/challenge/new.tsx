@@ -4,9 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Switch, View } from "react-native";
 import { AppText, Button, Chip, ErrorState, FormField, Screen } from "../../src/components/ui";
-import { todayLocal } from "../../src/lib/dates";
-import { useApi } from "../../src/services/api";
-import { invalidateGame } from "../../src/services/queryClient";
+import { todayLocal, useApi, invalidateGame } from "@agogeraining/app-core";
 
 const PRESETS = [
   { key: "pushups", title: "Max push-ups (good form)", metric: "pushups", direction: "higher_better", unit: "reps" },

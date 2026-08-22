@@ -3,11 +3,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { DemoBanner, Screen } from "../../src/components/ui";
 import { JourneyBuilder } from "../../src/features/journey/JourneyBuilder";
-import { track } from "../../src/lib/analytics";
-import { deviceTimeZone } from "../../src/lib/dates";
-import { useApi } from "../../src/services/api";
-import { invalidateGame } from "../../src/services/queryClient";
-import { useSession } from "../../src/stores/session";
+import { track, deviceTimeZone, useApi, invalidateGame, useSession } from "@agogeraining/app-core";
 
 /** Start a fresh journey (no open journey). Earned XP, ranks and history are kept; the new journey starts at Day 1. */
 export default function NewJourney() {

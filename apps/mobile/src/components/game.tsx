@@ -6,7 +6,7 @@ import { Modal, Pressable, View } from "react-native";
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 import Svg, { Circle, Line, Path, Polyline, Text as SvgText } from "react-native-svg";
 import { celebrate } from "../lib/feedback";
-import { useRewards } from "../stores/rewards";
+import { useRewards } from "@agogeraining/app-core";
 import { usePrefs, useTheme } from "../theme";
 import { AppText, Button, StatusTag } from "./ui";
 

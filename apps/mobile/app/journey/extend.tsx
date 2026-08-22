@@ -5,12 +5,7 @@ import React, { useMemo, useState } from "react";
 import { ConfirmationSheet, SpartanCard } from "../../src/components/game";
 import { AppText, Button, ErrorState, Loading, Screen } from "../../src/components/ui";
 import { PlanCards, PlanPreview } from "../../src/features/journey/components";
-import { nextAnchor, useCommandCenter, useJourneyPlan } from "../../src/features/journey/hooks";
-import { checkpointLabel, journeyErrorMessage } from "../../src/features/journey/labels";
-import { track } from "../../src/lib/analytics";
-import { useApi } from "../../src/services/api";
-import { invalidateGame } from "../../src/services/queryClient";
-import { useRewards } from "../../src/stores/rewards";
+import { nextAnchor, useCommandCenter, useJourneyPlan, checkpointLabel, journeyErrorMessage, track, useApi, invalidateGame, useRewards } from "@agogeraining/app-core";
 
 /** Extend Journey: preview → explicit confirmation → future-only regeneration on the server. */
 export default function ExtendJourney() {

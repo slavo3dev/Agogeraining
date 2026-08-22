@@ -1,8 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { View } from "react-native";
-import { draftQueue } from "../services/drafts";
-import { useRewards } from "../stores/rewards";
+import { draftQueue, useRewards } from "@agogeraining/app-core";
 import { AppText, Button } from "./ui";
 import { SpartanCard } from "./game";
 

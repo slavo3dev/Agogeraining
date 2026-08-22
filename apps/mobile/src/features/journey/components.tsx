@@ -5,7 +5,7 @@ import { Pressable, Switch, View } from "react-native";
 import { SpartanCard } from "../../components/game";
 import { AppText, Chip, FormField, StatusTag } from "../../components/ui";
 import { useTheme } from "../../theme";
-import { INTENSITY_LABEL, PHASE_LABEL, WEEKDAYS, checkpointLabel, rankLabel, sessionTitle, shortDate } from "./labels";
+import { INTENSITY_LABEL, PHASE_LABEL, WEEKDAYS, checkpointLabel, rankLabel, sessionTitle, shortDate } from "@agogeraining/app-core";
 
 // ---------------------------------------------------------------------------------------------
 // Plan cards — every plan is selectable; "Recommended" is a quiet suggestion, never a lock.

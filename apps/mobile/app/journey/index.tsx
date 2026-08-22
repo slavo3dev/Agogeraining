@@ -6,12 +6,7 @@ import { View } from "react-native";
 import { ConfirmationSheet, SpartanCard, StatTile } from "../../src/components/game";
 import { AppText, Button, DemoBanner, ErrorState, Loading, Screen, StatusTag } from "../../src/components/ui";
 import { SessionRow } from "../../src/features/journey/components";
-import { useCommandCenter } from "../../src/features/journey/hooks";
-import { PHASE_HINT, PHASE_LABEL, WEEKDAYS, checkpointLabel, journeyErrorMessage, shortDate } from "../../src/features/journey/labels";
-import { todayLocal } from "../../src/lib/dates";
-import { useApi } from "../../src/services/api";
-import { invalidateGame } from "../../src/services/queryClient";
-import { useSession } from "../../src/stores/session";
+import { useCommandCenter, PHASE_HINT, PHASE_LABEL, WEEKDAYS, checkpointLabel, journeyErrorMessage, shortDate, todayLocal, useApi, invalidateGame, useSession } from "@agogeraining/app-core";
 
 const CHANGE_LABEL: Record<string, string> = {
   created: "Journey started", migrated: "Migrated from the original 9-day campaign", extended: "Extended", plan_adjusted: "Schedule adjusted",

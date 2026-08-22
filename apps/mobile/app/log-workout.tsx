@@ -7,9 +7,7 @@ import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
 import { z } from "zod";
 import { AppText, Button, Chip, ErrorState, FormField, Screen } from "../src/components/ui";
-import { buildWorkout, submitWorkout } from "../src/features/workouts/submit";
-import { useApi } from "../src/services/api";
-import { useSession } from "../src/stores/session";
+import { buildWorkout, submitWorkout, useApi, useSession } from "@agogeraining/app-core";
 
 const Schema = z.object({
   activityType: z.enum(ACTIVITY_TYPES),

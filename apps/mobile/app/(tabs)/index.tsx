@@ -8,16 +8,7 @@ import { BossTrialCard, CampaignPath, QuestCard, RankEmblem, SpartanCard, StatTi
 import { DraftsBanner } from "../../src/components/DraftsBanner";
 import { AppText, Button, DemoBanner, ErrorState, Loading, Screen, StatusTag } from "../../src/components/ui";
 import { SessionRow } from "../../src/features/journey/components";
-import { useCommandCenter } from "../../src/features/journey/hooks";
-import { INTENSITY_LABEL, PHASE_LABEL, checkpointLabel, journeyErrorMessage, sessionTitle, shortDate } from "../../src/features/journey/labels";
-import { buildWorkout, submitWorkout } from "../../src/features/workouts/submit";
-import { promptForDate } from "../../src/features/stoic/prompts";
-import { appNow, todayLocal } from "../../src/lib/dates";
-import { useApi } from "../../src/services/api";
-import { invalidateGame } from "../../src/services/queryClient";
-import { useRewards } from "../../src/stores/rewards";
-import { useSession } from "../../src/stores/session";
-import { v4 } from "../../src/lib/uuid";
+import { useCommandCenter, INTENSITY_LABEL, PHASE_LABEL, checkpointLabel, journeyErrorMessage, sessionTitle, shortDate, buildWorkout, submitWorkout, promptForDate, appNow, todayLocal, useApi, invalidateGame, useRewards, useSession, v4 } from "@agogeraining/app-core";
 
 const VIRTUE_INTENTION: Record<string, string> = {
   wisdom: "Train with judgment: notice what your body tells you today.",

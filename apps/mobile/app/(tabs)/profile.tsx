@@ -7,12 +7,7 @@ import React, { useState } from "react";
 import { Alert, Share, Switch, View } from "react-native";
 import { ConfirmationSheet, ProgressChart, RankEmblem, SpartanCard, StatTile, XPBar } from "../../src/components/game";
 import { AppText, Button, Chip, DemoBanner, Screen, StatusTag } from "../../src/components/ui";
-import { FEATURE_STATUS } from "../../src/config/env";
-import { todayLocal } from "../../src/lib/dates";
-import { useApi, demoApi } from "../../src/services/api";
-import { invalidateGame } from "../../src/services/queryClient";
-import { analytics } from "../../src/lib/analytics";
-import { useSession } from "../../src/stores/session";
+import { FEATURE_STATUS, todayLocal, useApi, demoApi, invalidateGame, analytics, useSession } from "@agogeraining/app-core";
 import { usePrefs } from "../../src/theme";
 
 export default function Profile() {

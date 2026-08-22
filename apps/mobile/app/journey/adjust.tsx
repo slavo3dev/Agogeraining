@@ -7,11 +7,7 @@ import { View } from "react-native";
 import { ConfirmationSheet, SpartanCard } from "../../src/components/game";
 import { AppText, Button, Chip, ErrorState, FormField, Loading, Screen } from "../../src/components/ui";
 import { ScheduleForm, SessionRow, ToggleRow } from "../../src/features/journey/components";
-import { nextAnchor, useCommandCenter } from "../../src/features/journey/hooks";
-import { journeyErrorMessage } from "../../src/features/journey/labels";
-import { todayLocal } from "../../src/lib/dates";
-import { useApi } from "../../src/services/api";
-import { invalidateGame } from "../../src/services/queryClient";
+import { nextAnchor, useCommandCenter, journeyErrorMessage, todayLocal, useApi, invalidateGame } from "@agogeraining/app-core";
 
 /** Adjust availability, fixed sport days, equipment, limitations or an event. Future days only. */
 export default function AdjustJourney() {

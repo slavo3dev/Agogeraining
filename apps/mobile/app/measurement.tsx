@@ -5,10 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
 import { z } from "zod";
 import { AppText, Button, Chip, ErrorState, FormField, Screen } from "../src/components/ui";
-import { appNow } from "../src/lib/dates";
-import { useApi } from "../src/services/api";
-import { invalidateGame } from "../src/services/queryClient";
-import { useSession } from "../src/stores/session";
+import { appNow, useApi, invalidateGame, useSession } from "@agogeraining/app-core";
 import { useQuery } from "@tanstack/react-query";
 
 const METRICS = [["weight", "Weight"], ["body_fat", "Body fat (estimate)"], ["waist", "Waist"], ["pushups_max", "Max push-ups"]] as const;

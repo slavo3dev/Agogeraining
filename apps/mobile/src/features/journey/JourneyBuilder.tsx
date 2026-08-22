@@ -3,10 +3,8 @@ import { GoalInputSchema, PlanInputsSchema, type CreateJourneyInput, type GoalIn
 import React, { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import { AppText, Button, Chip, ErrorState, FormField } from "../../components/ui";
-import { track } from "../../lib/analytics";
-import { todayLocal } from "../../lib/dates";
+import { track, todayLocal, journeyErrorMessage } from "@agogeraining/app-core";
 import { PlanCards, PlanPreview, ScheduleForm, ToggleRow, type ScheduleFields } from "./components";
-import { journeyErrorMessage } from "./labels";
 
 export type JourneyDraft = Omit<CreateJourneyInput, "timezone">;
 export interface PreStep { title: string; render: () => React.ReactNode; validate?: () => Promise<boolean> | boolean }

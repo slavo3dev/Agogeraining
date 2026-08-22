@@ -1,11 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { STOIC_PROMPTS, promptForDate } from "../src/features/stoic/prompts";
+import { STOIC_PROMPTS, promptForDate, todayLocal, useApi, invalidateGame, useRewards } from "@agogeraining/app-core";
 import { AppText, Button, ErrorState, FormField, Screen } from "../src/components/ui";
-import { todayLocal } from "../src/lib/dates";
-import { useApi } from "../src/services/api";
-import { invalidateGame } from "../src/services/queryClient";
-import { useRewards } from "../src/stores/rewards";
 
 export default function Reflection() {
   const { prompt } = useLocalSearchParams<{ prompt?: string }>();

@@ -5,11 +5,7 @@ import { View } from "react-native";
 import { AppText, Chip, DemoBanner, FormField, Screen } from "../src/components/ui";
 import { JourneyBuilder, type PreStep } from "../src/features/journey/JourneyBuilder";
 import { ToggleRow } from "../src/features/journey/components";
-import { analytics, track } from "../src/lib/analytics";
-import { deviceTimeZone } from "../src/lib/dates";
-import { getApi } from "../src/services/api";
-import { invalidateGame } from "../src/services/queryClient";
-import { useSession } from "../src/stores/session";
+import { analytics, track, deviceTimeZone, getApi, invalidateGame, useSession } from "@agogeraining/app-core";
 
 const AVATARS = ["laurel", "shield", "spear", "column", "torch", "scroll"];
 const AGE_BANDS = ["18-29", "30-39", "40-49", "50-59", "60+"] as const;

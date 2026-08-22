@@ -3,12 +3,7 @@ import { useLocalSearchParams } from "expo-router";
 import React, { useRef, useState } from "react";
 import { ChallengeCard, SpartanCard } from "../../src/components/game";
 import { AppText, Button, ErrorState, FormField, Loading, Screen } from "../../src/components/ui";
-import { track } from "../../src/lib/analytics";
-import { v4 } from "../../src/lib/uuid";
-import { useApi } from "../../src/services/api";
-import { invalidateGame } from "../../src/services/queryClient";
-import { useRewards } from "../../src/stores/rewards";
-import { useSession } from "../../src/stores/session";
+import { track, v4, useApi, invalidateGame, useRewards, useSession } from "@agogeraining/app-core";
 
 export default function ChallengeDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();

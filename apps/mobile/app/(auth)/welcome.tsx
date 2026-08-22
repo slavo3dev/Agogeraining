@@ -5,7 +5,7 @@ import { View } from "react-native";
 import { RankEmblem } from "../../src/components/game";
 import { AppText, Button, Screen } from "../../src/components/ui";
 import { backendConfigured, env } from "../../src/config/env";
-import { useSession } from "../../src/stores/session";
+import { useSession } from "@agogeraining/app-core";
 
 export default function Welcome() {
   const router = useRouter(); const startDemo = useSession((s) => s.startDemo);
@@ -19,7 +19,7 @@ export default function Welcome() {
       </View>
       <View style={{ gap: 12, marginTop: 24 }}>
         {backendConfigured ? <Button title="Sign in or create account" onPress={() => router.push("/(auth)/sign-in")} /> : (
-          <AppText accessibilityRole="alert" style={{ textAlign: "center" }}>Backend not configured. Copy .env.example to apps/mobile/.env and start Supabase (see README).</AppText>
+          <AppText accessibilityRole="alert" style={{ textAlign: "center" }}>Backend not configured. Copy apps/mobile/.env.example to apps/mobile/.env.local and start Supabase (see README).</AppText>
         )}
         {env.demoEnabled ? <Button title="Try local demo (dev only)" variant="secondary" onPress={() => void startDemo()} accessibilityHint="Simulated on this device only" /> : null}
       </View>

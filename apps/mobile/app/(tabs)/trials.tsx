@@ -4,12 +4,7 @@ import React from "react";
 import { View } from "react-native";
 import { BossTrialCard, CampaignPath, ChallengeCard, SpartanCard } from "../../src/components/game";
 import { AppText, Button, ErrorState, Loading, Screen } from "../../src/components/ui";
-import { todayLocal } from "../../src/lib/dates";
-import { v4 } from "../../src/lib/uuid";
-import { useApi } from "../../src/services/api";
-import { invalidateGame } from "../../src/services/queryClient";
-import { useRewards } from "../../src/stores/rewards";
-import { useSession } from "../../src/stores/session";
+import { todayLocal, v4, useApi, invalidateGame, useRewards, useSession } from "@agogeraining/app-core";
 
 export default function Trials() {
   const api = useApi(); const router = useRouter(); const mode = useSession((s) => s.mode);
