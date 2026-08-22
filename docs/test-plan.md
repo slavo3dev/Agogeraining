@@ -80,3 +80,4 @@ Day 90/300 promotions (blocked on evidence types the app can't produce yet).
 4. Step through Days 2–8 (demo: Profile → Advance demo day), including two recovery days.
 5. Day 9: create a trial (beat your baseline) → submit → pass → claim Hoplitēs → crest/cloak and rank emblem update.
 6. Second account cannot see the first's measurements (remote mode).
+7.
