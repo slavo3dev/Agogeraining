@@ -12,3 +12,6 @@ android
 supabase/.branches
 supabase/.temp
 coverage
+.next
+next-env.d.ts
+*.tsbuildinfo

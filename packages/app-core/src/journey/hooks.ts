@@ -1,8 +1,8 @@
 import { addDays } from "@agogeraining/campaigns";
 import { useQuery } from "@tanstack/react-query";
-import { todayLocal } from "../../lib/dates";
-import { useApi } from "../../services/api";
-import { useSession } from "../../stores/session";
+import { useApi } from "../api";
+import { todayLocal } from "../dates";
+import { useSession } from "../session";
 
 export function useCommandCenter() {
   const api = useApi(); const mode = useSession((s) => s.mode); const today = todayLocal();

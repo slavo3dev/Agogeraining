@@ -16,6 +16,7 @@ jobs:
       - run: pnpm test
       - run: pnpm check:reference          # generated SQL must match TS rules/campaign/exercises
       - run: pnpm --filter @agogeraining/mobile export:check   # app bundles for iOS + Android
+      - run: pnpm build:web                                     # Next.js production build of the web app
       - name: Database migrations + integration tests
         run: |
           sudo apt-get update && sudo apt-get install -y postgresql postgresql-contrib

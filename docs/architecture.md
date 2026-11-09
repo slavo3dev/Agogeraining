@@ -3,7 +3,8 @@
 Modular monolith. No microservices, no custom API server.
 
 ```
-Expo iOS/Android ──► Supabase Auth
+Expo iOS/Android ─┐
+Next.js web ──────┴─► Supabase Auth
        │                  │ JWT
        ▼                  ▼
   supabase.rpc() ──► PostgreSQL: RLS + SECURITY DEFINER game functions (one transaction each)
@@ -33,15 +34,38 @@ Expo iOS/Android ──► Supabase Auth
 7. **Offline.** Workouts are written to an on-device draft queue first (`drafts-core.ts`), then synced with an idempotency key. Drafts
    are removed only after the server accepts them; permanent rejections are kept and shown, never silently dropped.
 
-## Mobile
+## Clients: mobile + web on one shared core
 
-Expo SDK 58, RN 0.88, Expo Router, TanStack Query (server state), Zustand (session/prefs/reward queue), React Hook Form + Zod
-(forms), Reanimated (XP bar, reward modal; respects reduced motion), `react-native-svg` (emblem, chart).
-`services/api` exposes one `GameApi` contract with two implementations: `remote` (Supabase RPC/RLS reads) and `demo`
-(on-device simulation, dev builds only).
+```
+apps/mobile (Expo Router, React Native)   apps/web (Next.js App Router, React DOM)
+        │  screens + native components            │  screens + HTML/CSS components
+        └──────────────┬──────────────────────────┘
+                       ▼
+            packages/app-core  ← configurePlatform({ storage, supabase, randomUUID, … })
+   GameApi (remote | demo) · session/rewards stores · draft queue · React Query hooks · analytics · labels · dates
+                       ▼
+   domain packages: game-engine · campaigns · challenges · training · shared-types · design-tokens
+```
+
+- **`packages/app-core`** holds everything both apps need that isn't UI: the `GameApi` contract with its `remote`
+  (Supabase RPC/RLS reads) and `demo` (local simulation, dev only) implementations, Zustand stores (session, reward queue),
+  the offline draft queue, TanStack Query hooks (`useCommandCenter`, `useJourneyPlan`), opt-in analytics, Stoic prompts and
+  display labels. It has no React Native or DOM imports.
+- **Platform adapters.** Each app calls `configurePlatform` once before rendering (`apps/mobile/src/platform.ts`,
+  `apps/web/src/platform.ts`): mobile passes AsyncStorage, a Supabase client whose session lives in the Keychain/Keystore
+  (`expo-secure-store`) and `expo-crypto`; web passes `localStorage`, a browser Supabase client and `crypto.randomUUID`.
+- **UI is per platform on purpose.** Mobile uses React Native components; web uses semantic HTML and CSS variables generated
+  from `@agogeraining/design-tokens`. Component names and props match (`SpartanCard`, `PlanCards`, `SessionRow`, …) so a
+  screen reads the same in both apps.
+- **Mobile:** Expo SDK 58, RN 0.88, Expo Router, Reanimated (XP bar, reward modal; respects reduced motion), `react-native-svg`.
+- **Web:** Next.js 16 App Router. Every screen is a client component (auth and data are per-user and live in the browser);
+  the root gate in `app/providers.tsx` applies the same signed-out → welcome → onboarding → app routing as the mobile layout.
+  Five tabs: top bar on desktop, bottom bar on phones.
+- Both: TanStack Query (server state), Zustand, React Hook Form + Zod (forms).
 
 ## Deliberate gaps
 
-Realtime Broadcast, Edge Functions, admin web and community tables are **not built**. Per-user quests are materialised as
+Realtime Broadcast, Edge Functions, the admin console and community tables are **not built**. The web app has no server-side
+rendering of player data (no Supabase SSR cookies) — it isn't needed while every screen is per-user. Per-user quests are materialised as
 versioned `planned_sessions` (Choose Your Journey); the schedule generator exists in TypeScript and SQL with a parity test,
 the same pattern as the level curve. See [journeys.md](journeys.md).

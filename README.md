@@ -3,7 +3,7 @@
 > **Train in the real world. Level up in the game.**
 > Consistency earns XP. Measurable, appropriate progress unlocks rank. Recovery counts as responsible training.
 
-A real-world fitness RPG for iOS and Android. *Spartan Levels* is a **working title pending trademark review**
+A real-world fitness RPG for iOS, Android and the web. *Spartan Levels* is a **working title pending trademark review**
 (one token: `BRAND` in `packages/design-tokens`). This repo root **is** the monorepo.
 
 ## Status
@@ -19,11 +19,12 @@ A real-world fitness RPG for iOS and Android. *Spartan Levels* is a **working ti
 | Body measurements + trend chart, Stoic reflection | **implemented** |
 | Email/password auth, onboarding, 5-tab app, dark/light, reduced motion | **implemented** |
 | Local demo mode (dev builds only, labelled) | **implemented** |
+| Web app (Next.js) with the same screens, sharing `packages/app-core` with mobile | **implemented** |
 | Day 90/300 promotions | gated on device-recorded / coach-reviewed evidence (arrives with health import / admin web) |
 | AI plan suggestions | planned (opt-in, human-reviewable layer on top of the deterministic generator) |
 | Phalanx social | planned (Phase 3 — UI is an honest gate, not a fake feed) |
 | HealthKit / Health Connect | planned (Phase 4 — provider interfaces exist) |
-| Apple/Google sign-in, push notifications, admin web | planned |
+| Apple/Google sign-in, push notifications, admin console | planned |
 | Run on a simulator/emulator/device | **not yet verified** (web build of the demo flow is driven end-to-end) — see [docs/test-plan.md](docs/test-plan.md) |
 
 ## Prerequisites
@@ -45,16 +46,18 @@ pnpm db:test         # applies every migration to a throwaway Postgres and runs 
 ### Run the app against a local backend
 
 ```bash
-supabase start                              # prints API URL + anon key
-cp .env.example apps/mobile/.env            # then paste the URL and anon key
-pnpm db:reset                               # (re)applies migrations + seed
-pnpm dev:mobile                             # Expo dev server
-pnpm ios                                    # or: pnpm android
+pnpm db:start                                         # Supabase in Docker; prints API URL + anon key
+cp apps/mobile/.env.example apps/mobile/.env.local    # paste the URL and anon key
+cp apps/web/.env.example apps/web/.env.local          # same values, NEXT_PUBLIC_* names
+pnpm db:reset                                         # (re)applies migrations + seed
+pnpm dev:mobile                                       # Expo dev server → i / a
+pnpm dev:web                                          # Next.js → http://localhost:3000
 ```
 
 ### Run with no backend (local demo)
 
-Set `EXPO_PUBLIC_ENABLE_DEMO_MODE=true` in `apps/mobile/.env`, run `pnpm dev:mobile`, tap **Try local demo (dev only)**.
+Set `EXPO_PUBLIC_ENABLE_DEMO_MODE=true` in `apps/mobile/.env.local` (or `NEXT_PUBLIC_ENABLE_DEMO_MODE=true` in
+`apps/web/.env.local`), run `pnpm dev:mobile` or `pnpm dev:web`, choose **Try local demo (dev only)**.
 It is simulated on-device, visibly labelled, ignored by production builds, and has a dev-only “Advance demo day” button
 so you can play through any journey. It cannot affect real accounts or leaderboards.
 
@@ -66,10 +69,13 @@ so you can play through any journey. It cannot affect real accounts or leaderboa
 | Command | What it does |
 |---|---|
 | `pnpm dev:mobile` / `ios` / `android` | Start Expo / open simulator / emulator |
+| `pnpm dev:web` · `build:web` · `start:web` | Next.js dev server (port 3000) · production build · serve the build |
 | `pnpm test` · `pnpm typecheck` | Unit tests · strict TypeScript across all packages |
 | `pnpm db:start` · `db:reset` · `db:test` | Supabase up · reset DB · migration integration tests |
 | `pnpm gen:reference` · `check:reference` | Regenerate / verify reference-data migration from TypeScript rules |
 | `pnpm --filter @agogeraining/mobile export:check` | Prove the app bundles for iOS + Android |
+
+Run Expo commands from `apps/mobile` (e.g. `cd apps/mobile && pnpm exec expo install --check`); from the repo root `npx expo` picks up the legacy global CLI.
 
 ## Reset / seed the database
 
@@ -88,12 +94,14 @@ catalog, the six plan templates and the session library live in **generated migr
 6. Before inviting people: complete the store checklist in [docs/privacy-and-security.md](docs/privacy-and-security.md)
    (privacy policy, Data Safety form, App Privacy labels, account-deletion path, trademark review).
 
-No credentials are in this repo. `.env.example` has placeholders only.
+No credentials are in this repo. The `.env.example` files have placeholders only.
 
 ## Layout
 
 ```
-apps/mobile            Expo Router app (iOS + Android)        apps/admin   planned
+apps/mobile            Expo Router app (iOS + Android)
+apps/web               Next.js App Router app (browser)       apps/admin   planned
+packages/app-core      Client code shared by mobile + web: API (remote/demo), stores, hooks, offline drafts, labels
 packages/game-engine   XP, levels, quest rewards, rank + trial rules (pure TS, tested)
 packages/campaigns     Clock, timezone-safe day logic, plan catalog, journey state machine, schedule generator
 packages/challenges    Trial state machine + goal plausibility

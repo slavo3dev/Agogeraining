@@ -1,6 +1,6 @@
 import type { NewReward } from "@agogeraining/shared-types";
 import { create } from "zustand";
-import { analytics } from "../lib/analytics";
+import { analytics } from "./analytics";
 
 /** Rewards come from server responses only; this store just queues them for presentation. */
 interface RewardsState { queue: NewReward[]; show: (r: NewReward[]) => void; dismiss: () => void }

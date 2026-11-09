@@ -3,11 +3,12 @@ import type {
 } from "@agogeraining/shared-types";
 import { MutationResult as MutationResultSchema } from "@agogeraining/shared-types";
 import type { PostgrestError } from "@supabase/supabase-js";
-import { supabase } from "../supabase";
+import { platform } from "../platform";
 import { ApiError, type GameApi } from "./types";
 
 const client = () => {
-  if (!supabase) throw new ApiError("backend_not_configured", "Backend is not configured. Copy .env.example to apps/mobile/.env.");
+  const { supabase, envFile } = platform();
+  if (!supabase) throw new ApiError("backend_not_configured", `Backend is not configured. Copy .env.example to ${envFile}.`);
   return supabase;
 };
 

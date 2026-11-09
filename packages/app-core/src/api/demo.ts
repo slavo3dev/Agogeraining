@@ -3,7 +3,6 @@
  * pure packages (game-engine, campaigns). Nothing here touches Supabase, leaderboards or real accounts, and
  * the UI labels it as a demo everywhere. A production build never enables it (see config/env.ts).
  */
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   JourneyError, addDays, adjustPlan, checkpointsFor, createJourney, creditDay, extendJourney, localDateFor, pauseJourney,
   planByKey, resumeJourney, sessionFor, validatePlanInputs, weekDays, type Journey, type PlanInputs,
@@ -18,6 +17,7 @@ import type {
   PromotionEvaluation, ReflectionRow, WorkoutRow,
 } from "@agogeraining/shared-types";
 import { convert, type ActivityType, type Unit } from "@agogeraining/training";
+import { platform } from "../platform";
 import { ApiError, type GameApi } from "./types";
 
 const KEY = "agogeraining.demo.v1";
@@ -57,7 +57,7 @@ const DEFAULT_INPUTS: PlanInputs = {
 let cache: State | null = null;
 async function load(): Promise<State> {
   if (cache) return cache;
-  const raw = await AsyncStorage.getItem(KEY);
+  const raw = await platform().storage.getItem(KEY);
   cache = raw ? ({ ...fresh(), ...(JSON.parse(raw) as State) }) : fresh();
   // migrate a pre-journey demo (fixed nine days) without losing credited days
   if (cache.campaign && !cache.journey) {
@@ -70,7 +70,7 @@ async function load(): Promise<State> {
   demoClock.offsetDays = cache.offsetDays;
   return cache;
 }
-const save = async (s: State) => { cache = s; demoClock.offsetDays = s.offsetDays; await AsyncStorage.setItem(KEY, JSON.stringify(s)); };
+const save = async (s: State) => { cache = s; demoClock.offsetDays = s.offsetDays; await platform().storage.setItem(KEY, JSON.stringify(s)); };
 const id = () => `demo-${Math.random().toString(36).slice(2, 10)}`;
 
 const nowDate = (s: State) => new Date(Date.now() + s.offsetDays * 86_400_000);
@@ -130,7 +130,7 @@ function dayLabel(day: number, total: number): string {
 export const demoApi: GameApi & { advanceDay(): Promise<void>; reset(): Promise<void> } = {
   mode: "demo",
   async advanceDay() { const s = await load(); s.offsetDays += 1; await save(s); },
-  async reset() { cache = fresh(); demoClock.offsetDays = 0; await AsyncStorage.removeItem(KEY); },
+  async reset() { cache = fresh(); demoClock.offsetDays = 0; await platform().storage.removeItem(KEY); },
   async hasProfile() { return (await load()).profile !== null; },
   async createProfile(i) { const s = await load(); s.profile = { displayName: i.displayName, avatarId: i.avatarId, primaryFocus: i.primaryFocus }; s.unitSystem = i.unitSystem; s.timezone = i.timezone; await save(s); },
   async recordConsent() { /* demo stores no consents */ },

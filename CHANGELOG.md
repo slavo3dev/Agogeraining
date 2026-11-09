@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased — Web app + shared client core
+
+**Added**
+- `apps/web`: Next.js 16 (App Router, React 19) web app with every mobile screen — welcome/sign-in, onboarding and
+  Choose Your Journey, Command/Quests/Trials/Phalanx/Player tabs, My Journey (extend, adjust, checkpoint review),
+  workout logging, measurements, Stoic reflection, challenges and trials. Same rules, same Supabase backend, same
+  local demo mode (`next dev` only). Bottom tab bar on phones, top bar on desktop; dark/light/system theme.
+- `packages/app-core`: client code shared by mobile and web — `GameApi` (remote + demo), session and reward stores,
+  offline draft queue, React Query hooks, analytics, dates, units, journey labels, Stoic prompts. Platform specifics are
+  injected with `configurePlatform` (AsyncStorage/SecureStore/expo-crypto on mobile; localStorage/crypto on web).
+- Root scripts `dev:web`, `build:web`, `start:web`; CI builds the web app. Per-app `.env.example` files.
+
+**Changed**
+- Mobile imports the shared code from `@agogeraining/app-core` instead of `src/services`, `src/stores`, `src/lib`;
+  behaviour is unchanged (same tests, now in app-core).
+- Expo SDK 58 patch updates (`expo` 58.0.23, `expo-router` 58.0.30, `react-native-safe-area-context` 5.11.1, …).
+
 ## Unreleased — Choose Your Journey
 
 **Added**

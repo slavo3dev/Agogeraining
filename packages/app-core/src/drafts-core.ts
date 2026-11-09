@@ -1,10 +1,8 @@
 import type { CompleteWorkoutInput, MutationResult, NewReward } from "@agogeraining/shared-types";
 import { ApiError } from "./api/types";
 
-export interface KeyValueStore {
-  getItem(key: string): Promise<string | null>;
-  setItem(key: string, value: string): Promise<void>;
-}
+/** Only get/set are needed here, so tests can pass a minimal in-memory store. */
+export type KeyValueStore = Pick<import("./platform").KeyValueStore, "getItem" | "setItem">;
 export interface Draft {
   input: CompleteWorkoutInput;
   status: "pending" | "rejected";

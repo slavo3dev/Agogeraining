@@ -1,6 +1,6 @@
 import { localDateFor } from "@agogeraining/campaigns";
-import { demoClock } from "../services/api/demo";
-import { useSession } from "../stores/session";
+import { demoClock } from "./api/demo";
+import { useSession } from "./session";
 
 export function deviceTimeZone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";

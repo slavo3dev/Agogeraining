@@ -1,15 +1,15 @@
 import type { CompleteWorkoutInput } from "@agogeraining/shared-types";
-import * as Crypto from "expo-crypto";
-import { appNow, deviceTimeZone, todayLocal } from "../../lib/dates";
-import { draftQueue } from "../../services/drafts";
-import { invalidateGame } from "../../services/queryClient";
-import { useRewards } from "../../stores/rewards";
+import { appNow, deviceTimeZone, todayLocal } from "./dates";
+import { draftQueue } from "./drafts";
+import { platform } from "./platform";
+import { invalidateGame } from "./queryClient";
+import { useRewards } from "./rewards";
 
 export type SubmitStatus = "synced" | "queued" | "rejected";
 
 export function buildWorkout(p: Omit<CompleteWorkoutInput, "idempotencyKey" | "startedAt" | "localDay" | "timezone" | "origin"> & { startedAt?: string }): CompleteWorkoutInput {
   return {
-    ...p, idempotencyKey: Crypto.randomUUID(), startedAt: p.startedAt ?? new Date(appNow().getTime() - p.durationSeconds * 1000).toISOString(),
+    ...p, idempotencyKey: platform().randomUUID(), startedAt: p.startedAt ?? new Date(appNow().getTime() - p.durationSeconds * 1000).toISOString(),
     localDay: todayLocal(), timezone: deviceTimeZone(), origin: "manual",
   };
 }

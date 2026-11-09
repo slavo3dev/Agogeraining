@@ -1,4 +1,4 @@
-import { useSession } from "../../stores/session";
+import { useSession } from "../session";
 import { demoApi } from "./demo";
 import { remoteApi } from "./remote";
 import type { GameApi } from "./types";
